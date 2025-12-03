@@ -3,26 +3,49 @@ public class Wordle {
     // Reads all words from dictionary filename into a String array.
     public static String[] readDictionary(String filename) {
 		// ...
+        In file = new In(filename);
+        String[] words = file.readAllStrings();
+        return words;
     }
 
     // Choose a random secret word from the dictionary. 
     // Hint: Pick a random index between 0 and dict.length (not including) using Math.random()
     public static String chooseSecretWord(String[] dict) {
 		// ...
+        int index = (int)(Math.random() * dict.length);
+        String chosen = dict[index];
+        return chosen;
     }
 
     // Simple helper: check if letter c appears anywhere in secret (true), otherwise
     // return false.
     public static boolean containsChar(String secret, char c) {
 		// ...
-    }
+        int N = secret.length();
+        for(int i = 0; i < N; i++){
+            if(c == secret.charAt(i)) return true;
+            }
+                  return false;
+        }
+    
 
     // Compute feedback for a single guess into resultRow.
     // G for exact match, Y if letter appears anywhere else, _ otherwise.
     public static void computeFeedback(String secret, String guess, char[] resultRow) {
 		// ...
 		// you may want to use containsChar in your implementation
-    }
+        for(int i = 0; i < secret.length(); i++){ //רצים על האותיות של הניחוש
+        if(guess.charAt(i) == secret.charAt(i)) // אם האות שווה במקום 
+            resultRow[i] = 'G';
+    
+            else if(containsChar(secret, guess.charAt(i))){ // אם האות קיימת במילה הסודית
+                resultRow[i] = 'Y';
+            } else {
+                resultRow[i] = '_';
+            }
+        }      
+      }
+
 
     // Store guess string (chars) into the given row of guesses 2D array.
     // For example, of guess is HELLO, and row is 2, then after this function 
@@ -34,6 +57,9 @@ public class Wordle {
 	// guesses[2][4] // 'O'
     public static void storeGuess(String guess, char[][] guesses, int row) {
 		// ...
+            for(int j = 0; j < guess.length(); j++){ // לולאה של אורך שורה
+               guesses [row][j] = guess.charAt(j); 
+        }
     }
 
     // Prints the game board up to currentRow (inclusive).
@@ -56,6 +82,11 @@ public class Wordle {
     // Returns true if all entries in resultRow are 'G'.
     public static boolean isAllGreen(char[] resultRow) {
 		// ...
+        int N = resultRow.length;
+        for(int i = 0; i < N; i++){
+          if(resultRow[i] != 'G') return false;
+        }
+        return true;
     }
 
     public static void main(String[] args) {
@@ -70,8 +101,8 @@ public class Wordle {
         String secret = chooseSecretWord(dict);
 
         // Prepare 2D arrays for guesses and results
-        char[][] guesses = // ...
-        char[][] results = // ...
+        char[][] guesses = new char[MAX_ATTEMPTS][WORD_LENGTH];// ...
+        char[][] results = new char[MAX_ATTEMPTS][WORD_LENGTH]; // ...
 
         // Prepare to read from the standart input 
         In inp = new In();
@@ -87,9 +118,9 @@ public class Wordle {
             // Loop until you read a valid guess
             while (!valid) {
                 System.out.print("Enter your guess (5-letter word): ");
-                guess = // ... read from the standrad input
+                guess = inp.readString();  // ... read from the standrad input
                 
-                if (/* ... check if the guess is valid */) {
+                if (guess.length() != 5/* ... check if the guess is valid */) {
                     System.out.println("Invalid word. Please try again.");
                 } else {
                     valid = true;
@@ -98,6 +129,8 @@ public class Wordle {
 
             // Store guess and compute feedback
             // ... use storeGuess and computeFeedback
+            storeGuess(guess, guesses, attempt);
+            computeFeedback(secret, guess, results[attempt]);
 
             // Print board
             printBoard(guesses, results, attempt);
@@ -112,7 +145,9 @@ public class Wordle {
         }
 
         if (!won) {
-            // ... follow the assignment examples for how the printing should look like
+            System.out.println("Sorry, you did not guess the word."); // ... follow the assignment examples for how the printing should look like
+            System.out.println("The secret word was: " + secret);
+            won = false;
         }
 
         inp.close();
